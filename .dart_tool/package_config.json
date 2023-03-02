@@ -38,6 +38,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "english_words",
+      "rootUri": "file:///Users/jeongeun/.pub-cache/hosted/pub.dev/english_words-4.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "fake_async",
       "rootUri": "file:///Users/jeongeun/.pub-cache/hosted/pub.dev/fake_async-1.3.1",
       "packageUri": "lib/",
@@ -152,7 +158,7 @@
       "languageVersion": "2.19"
     }
   ],
-  "generated": "2023-03-01T15:42:14.918Z",
+  "generated": "2023-03-02T14:23:39.754861Z",
   "generator": "pub",
   "generatorVersion": "2.19.0"
 }
