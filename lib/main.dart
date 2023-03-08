@@ -1,59 +1,63 @@
-// Copyright 2018 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Startup Name Generator',
-      home: RandomWords(),
+    return ChangeNotifierProvider(
+      create: (context) => MyAppState(),
+      child: MaterialApp(
+          title: 'Namer App',
+          theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange)),
+          home: MyHomePage()),
     );
   }
 }
 
-// 위젯으로써 사용하겠다.
-class RandomWords extends StatefulWidget {
-  const RandomWords({super.key});
+// flutter 상태를 관리하는 간단한 방법 중 하나.
+// app이 처리할 데이터를 정의하는 클래스.
+// 데이터에 변화가 생기면 다른 위젯들에게 notify한다.
+// ChangeNotifierProvider를 사용하는 the whole app의 어느 위젯이든 상관없이 상태를 사용할 수 있다.
+class MyAppState extends ChangeNotifier {
+  var current = WordPair.random();
 
-  @override
-  RandomWordsState createState() => RandomWordsState();
+  void getNext() {
+    current = WordPair.random();
+    notifyListeners();
+  }
 }
 
-// 해당 클래스가 관리하는 상태는 RandomWords 위젯의 상태
-class RandomWordsState extends State<RandomWords> {
-  final _suggestion = <WordPair>[];
-  final _biggerFont = const TextStyle(fontSize: 18.0);
-
-  Widget _buildSuggestions() {
-    return ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemBuilder: (context, i) {
-          if (i.isOdd) return const Divider();
-
-          final index = i ~/ 2;
-          if (index >= _suggestion.length) {
-            _suggestion.addAll(generateWordPairs().take(10));
-          }
-          return _buildRow(_suggestion[index]);
-        });
-  }
-
-  Widget _buildRow(WordPair pair) {
-    return ListTile(title: Text(pair.asSnakeCase, style: _biggerFont));
-  }
-
+class MyHomePage extends StatelessWidget {
   @override
+  // 모든 위젯은 build 메소드를 갖는다. 자동으로 호출된다.
   Widget build(BuildContext context) {
+    // watch 메소드를 통해 앱의 현재 상태를 추적한다.
+    var appState = context.watch<MyAppState>();
+
+    // 모든 build 메소드는 위젯이나 위젯 트리를 반환한다. (scaffold: 발판)
     return Scaffold(
-        appBar: AppBar(title: const Text('Startup name generator')),
-        body: _buildSuggestions());
+        // Column은 children을 받아 top to bottom 나열한다.
+        body: Column(
+      children: [
+        Text("A random idea is: "),
+        // appState.current의 getter로써 asLowerCase를 택했다.
+        Text(appState.current.asLowerCase),
+        ElevatedButton(
+            onPressed: () {
+              appState.getNext();
+            },
+            child: Text('Next'))
+        // trailing comma 사용하는 게 바람직하다.
+      ],
+    ));
   }
 }
