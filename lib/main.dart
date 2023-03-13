@@ -18,6 +18,8 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
               useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange)),
+          // colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(0, 255, 0, 1.0))),
+          // colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffff9e00))),
           home: MyHomePage()),
     );
   }
@@ -42,22 +44,59 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // watch 메소드를 통해 앱의 현재 상태를 추적한다.
     var appState = context.watch<MyAppState>();
+    var pair = appState.current;
 
     // 모든 build 메소드는 위젯이나 위젯 트리를 반환한다. (scaffold: 발판)
     return Scaffold(
         // Column은 children을 받아 top to bottom 나열한다.
-        body: Column(
-      children: [
-        Text("A random idea is: "),
-        // appState.current의 getter로써 asLowerCase를 택했다.
-        Text(appState.current.asLowerCase),
-        ElevatedButton(
-            onPressed: () {
-              appState.getNext();
-            },
-            child: Text('Next'))
-        // trailing comma 사용하는 게 바람직하다.
-      ],
+        body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(pair: pair),
+          SizedBox(
+            height: 10,
+          ),
+          ElevatedButton(
+              onPressed: () {
+                appState.getNext();
+              },
+              child: Text('Next'))
+          // trailing comma 사용하는 게 바람직하다.
+        ],
+      ),
     ));
+  }
+}
+
+class BigCard extends StatelessWidget {
+  const BigCard({
+    super.key,
+    required this.pair,
+  });
+
+  final WordPair pair;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+    // 이론적으로 null일 수 있기 때문에 ! 연산자(Bang 연산자)를 사용한다.
+    // copyWith 메소드는 color로 정의한 변경 사항을 적용해 text style의 복사본을 반환한다.
+    var style = theme.textTheme.displayMedium!.copyWith(
+        color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold);
+
+    return Card(
+      color: theme.colorScheme.primary,
+      elevation: 5,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(
+          // getter로써 asLowerCase를 택했다.
+          pair.asPascalCase,
+          style: style,
+          semanticsLabel: "${pair.first} ${pair.second}",
+        ),
+      ),
+    );
   }
 }
