@@ -36,6 +36,17 @@ class MyAppState extends ChangeNotifier {
     current = WordPair.random();
     notifyListeners();
   }
+
+  var favorites = <WordPair>[];
+
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -57,11 +68,25 @@ class MyHomePage extends StatelessWidget {
           SizedBox(
             height: 10,
           ),
-          ElevatedButton(
-              onPressed: () {
-                appState.getNext();
-              },
-              child: Text('Next'))
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: Icon(appState.favorites.contains(pair)
+                      ? Icons.favorite_border
+                      : Icons.favorite),
+                  label: Text('Like')),
+              SizedBox(width: 10),
+              ElevatedButton(
+                  onPressed: () {
+                    appState.getNext();
+                  },
+                  child: Text('Next')),
+            ],
+          )
           // trailing comma 사용하는 게 바람직하다.
         ],
       ),
