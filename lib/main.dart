@@ -51,16 +51,46 @@ class MyAppState extends ChangeNotifier {
 
 class MyHomePage extends StatelessWidget {
   @override
+  Widget build(BuildContext context) {
+    // 모든 build 메소드는 위젯이나 위젯 트리를 반환한다. (scaffold: 발판)
+    return Scaffold(
+        body: Row(
+      children: [
+        // 하드웨어 노치나 상대 표시줄에 의해 child가 가려지지 않도록 보장한다.
+        SafeArea(
+            child: NavigationRail(
+          // true로 변경하면 Icon 오른쪽에 Text를 표시한다.
+          extended: false,
+          destinations: [
+            NavigationRailDestination(
+                icon: Icon(Icons.home), label: Text('Home')),
+            NavigationRailDestination(
+                icon: Icon(Icons.favorite), label: Text('Favorites'))
+          ],
+          selectedIndex: 0,
+          onDestinationSelected: (value) {
+            print('selected: $value');
+          },
+        )),
+        // greedy하다. 최대한 많은 공간을 차지한다.
+        Expanded(
+            child: Container(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: GeneratorPage())),
+      ],
+    ));
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
+  @override
   // 모든 위젯은 build 메소드를 갖는다. 자동으로 호출된다.
   Widget build(BuildContext context) {
     // watch 메소드를 통해 앱의 현재 상태를 추적한다.
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
-    // 모든 build 메소드는 위젯이나 위젯 트리를 반환한다. (scaffold: 발판)
-    return Scaffold(
-        // Column은 children을 받아 top to bottom 나열한다.
-        body: Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -90,7 +120,7 @@ class MyHomePage extends StatelessWidget {
           // trailing comma 사용하는 게 바람직하다.
         ],
       ),
-    ));
+    );
   }
 }
 
