@@ -49,9 +49,30 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+// State를 extends하기 때문에 own values를 관리할 수 있다. 스스로 변경할 수 있다.
+class _MyHomePageState extends State<MyHomePage> {
+  var selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
+    Widget page;
+    switch (selectedIndex) {
+      case 0:
+        page = GeneratorPage();
+        break;
+      case 1:
+        page = Placeholder();
+        break;
+      default:
+        // development 환경에서 프로그램을 crash한다.
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+
     // 모든 build 메소드는 위젯이나 위젯 트리를 반환한다. (scaffold: 발판)
     return Scaffold(
         body: Row(
@@ -67,16 +88,19 @@ class MyHomePage extends StatelessWidget {
             NavigationRailDestination(
                 icon: Icon(Icons.favorite), label: Text('Favorites'))
           ],
-          selectedIndex: 0,
+          selectedIndex: selectedIndex,
           onDestinationSelected: (value) {
-            print('selected: $value');
+            // setState 내부에서 상태를 변경한다. notifyListeners()와 비슷하게 UI 업데이트를 보장한다.
+            setState(() {
+              selectedIndex = value;
+            });
           },
         )),
         // greedy하다. 최대한 많은 공간을 차지한다.
         Expanded(
             child: Container(
                 color: Theme.of(context).colorScheme.primaryContainer,
-                child: GeneratorPage())),
+                child: page)),
       ],
     ));
   }
