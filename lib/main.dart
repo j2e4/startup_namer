@@ -73,36 +73,43 @@ class _MyHomePageState extends State<MyHomePage> {
         throw UnimplementedError('no widget for $selectedIndex');
     }
 
-    // 모든 build 메소드는 위젯이나 위젯 트리를 반환한다. (scaffold: 발판)
-    return Scaffold(
-        body: Row(
-      children: [
-        // 하드웨어 노치나 상대 표시줄에 의해 child가 가려지지 않도록 보장한다.
-        SafeArea(
-            child: NavigationRail(
-          // true로 변경하면 Icon 오른쪽에 Text를 표시한다.
-          extended: false,
-          destinations: [
-            NavigationRailDestination(
-                icon: Icon(Icons.home), label: Text('Home')),
-            NavigationRailDestination(
-                icon: Icon(Icons.favorite), label: Text('Favorites'))
-          ],
-          selectedIndex: selectedIndex,
-          onDestinationSelected: (value) {
-            // setState 내부에서 상태를 변경한다. notifyListeners()와 비슷하게 UI 업데이트를 보장한다.
-            setState(() {
-              selectedIndex = value;
-            });
-          },
-        )),
-        // greedy하다. 최대한 많은 공간을 차지한다.
-        Expanded(
-            child: Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: page)),
-      ],
-    ));
+    // constraints이 바뀔 때마다 builder를 호출한다.
+    //  1. window 사이즈 변경  2. 디바이스 rotate 3. 주변 위젯의 사이즈 변경으로 인해 해당 위젯이 작아질 때
+    return LayoutBuilder(builder: (context, constraints) {
+      // 모든 build 메소드는 위젯이나 위젯 트리를 반환한다. (scaffold: 발판)
+      return Scaffold(
+          body: Row(
+        children: [
+          // 하드웨어 노치나 상대 표시줄에 의해 child가 가려지지 않도록 보장한다.
+          SafeArea(
+              // NavigationRail은 충분한 공간이 있어도 자동으로 label을 보여주지 않는다. 모든 context에서 충분한 공간이 무엇인지 모르기 때문
+              // 참고로 Row, Column과 비슷한 Wrap 위젯을 통해 충분한 공간이 없을 때 다음 line으로 children을 wrap하거나
+              //  FittedBox 위젯을 통해 개발자의 명세에 따라 사용 가능한 공간에 child를 자동으로 fit할 수 있다.
+              child: NavigationRail(
+            // true면 Icon 오른쪽에 Text를 표시한다.
+            extended: constraints.maxWidth >= 600,
+            destinations: [
+              NavigationRailDestination(
+                  icon: Icon(Icons.home), label: Text('Home')),
+              NavigationRailDestination(
+                  icon: Icon(Icons.favorite), label: Text('Favorites'))
+            ],
+            selectedIndex: selectedIndex,
+            onDestinationSelected: (value) {
+              // setState 내부에서 상태를 변경한다. notifyListeners()와 비슷하게 UI 업데이트를 보장한다.
+              setState(() {
+                selectedIndex = value;
+              });
+            },
+          )),
+          // greedy하다. 최대한 많은 공간을 차지한다.
+          Expanded(
+              child: Container(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: page)),
+        ],
+      ));
+    });
   }
 }
 
