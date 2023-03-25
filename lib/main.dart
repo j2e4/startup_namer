@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = GeneratorPage();
         break;
       case 1:
-        page = Placeholder();
+        page = FavoritePage();
         break;
       default:
         // development 환경에서 프로그램을 crash한다.
@@ -183,6 +183,32 @@ class BigCard extends StatelessWidget {
           semanticsLabel: "${pair.first} ${pair.second}",
         ),
       ),
+    );
+  }
+}
+
+class FavoritePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var favorites = appState.favorites;
+
+    if (favorites.isEmpty) {
+      return Center(
+        child: Text("No favorites yet."),
+      );
+    }
+
+    return ListView(
+      children: [
+        for (var favorite in favorites)
+          Padding(
+              padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
+              child: ListTile(
+                leading: Icon(Icons.favorite),
+                title: Text(favorite.asPascalCase),
+              )),
+      ],
     );
   }
 }
